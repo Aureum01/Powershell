@@ -1,11 +1,13 @@
 # Install wfuzz if it is not already installed
-if (!(Test-Path "$env:LOCALAPPDATA\wfuzz\wfuzz.exe")) {
-  Invoke-WebRequest -Uri "https://github.com/xmendez/wfuzz/releases/download/v3.6.0/wfuzz-3.6.0-windows.zip" -OutFile "$env:TEMP\wfuzz.zip"
-  Expand-Archive -Path "$env:TEMP\wfuzz.zip" -DestinationPath "$env:LOCALAPPDATA\wfuzz"
+$wfuzzPath = "$env:LOCALAPPDATA\wfuzz\wfuzz.exe"
+if (!(Test-Path $wfuzzPath)) {
+  # Download and extract wfuzz
+  $url = "https://github.com/xmendez/wfuzz/releases/download/v3.6.0/wfuzz-3.6.0-windows.zip"
+  $zip = "$env:TEMP\wfuzz.zip"
+  $destination = "$env:LOCALAPPDATA\wfuzz"
+  Invoke-WebRequest -Uri $url -OutFile $zip
+  Expand-Archive -Path $zip -DestinationPath $destination
 }
-
-# Set the path to the wfuzz executable
-$wfuzz = "$env:LOCALAPPDATA\wfuzz\wfuzz.exe"
 
 # Set the URL to scan
 $url = 'http://example.com/ssrf-vulnerable-endpoint'
@@ -30,7 +32,7 @@ $wordlist = 'C:\path\to\wordlist.txt'
 $output = 'C:\path\to\output.txt'
 
 # Build the wfuzz command
-$command = "$wfuzz -u $url"
+$command = "$wfuzzPath -u $url"
 foreach ($header in $headers.GetEnumerator()) {
   $command += " -H '$($header.Key): $($header.Value)'"
 }
@@ -41,6 +43,12 @@ $command += " -w $wordlist -o $output -t 20 > nul"
 
 # Run the wfuzz command
 & cmd /c $command
+
+# Check if the output file was created
+if (!(Test-Path $output)) {
+  Write-Error "Error: wfuzz did not create an output file"
+  return
+}
 
 # Read the output file and search for SSRF vulnerabilities
 $output = Get-Content -Path $output
