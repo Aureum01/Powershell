@@ -16,13 +16,13 @@ $ip = "192.168.1.100"
 
 # Scan the target for open ports and service information
 try {
-    $ports = Invoke-NmapScan @nmapOptions -Target $ip
+    $scanResult = Invoke-Nmap -ConfigArgs @nmapOptions -Targets $ip
 } catch {
     Write-Error "Error running Nmap: $($_.Exception.Message)"
 }
 
 # Check each open port for vulnerabilities
-foreach ($port in $ports) {
+foreach ($port in $scanResult.Ports) {
     # Search the ExploitDB database for exploits targeting the current port
     try {
         $exploits = Search-ExploitDB @exploitDBOptions -Port $port.Number
@@ -40,4 +40,8 @@ foreach ($port in $ports) {
 }
 
 # Output the detected operating system
-Write-Output "Operating system detected: $($ports[0].OS.Name)"
+if ($scanResult.OS.OSMatches) {
+    Write-Output "Operating system detected: $($scanResult.OS.OSMatches[0].Name)"
+} else {
+    Write-Output "Unable to detect operating system."
+}
