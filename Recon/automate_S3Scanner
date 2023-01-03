@@ -1,0 +1,15 @@
+# Set the desired options
+$options = @{
+    'Verbose' = $true
+    'Output' = "csv"
+}
+
+# Set the target URL
+$url = "http://example.com"
+
+# Run S3Scanner with the specified options
+try {
+    & S3Scanner @options -u $url
+} catch {
+    Write-Error "Error running S3Scanner: $($_.Exception.Message)"
+}
