@@ -20,6 +20,7 @@ First, it gets a list of all .php files in the specified directory by using the 
 
 Next, the script loops through each file in $php_files using a foreach loop. For each file, it reads the contents into the $contents variable using the Get-Content cmdlet. It then sets a $vulnerable variable to $false, which will be used to track whether any vulnerable code has been found in the file.
 
+** Been a little while since I've updated this repo, apologies
 The script then checks for several different patterns in the contents of the file. If it finds any of these patterns, it sets the $vulnerable variable to $true and outputs a message indicating which pattern was found and in which file. The script also looks for the presence of certain XSL elements or functions that might be whitelisted (allowed even if a vulnerability is present).
 
 At the end of the loop, if $vulnerable is still $false, the script outputs a message indicating that no vulnerabilities were found in the file. If $vulnerable is $true, it outputs a message indicating that a possible XSL vulnerability was found in the file.
